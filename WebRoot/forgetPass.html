@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>找回密码页面</title>
+    <link href="css/default.css" rel="stylesheet" type="text/css" />
+	<!--必要样式-->
+    <link href="css/styles.css" rel="stylesheet" type="text/css" />
+    <link href="css/demo.css" rel="stylesheet" type="text/css" />
+    <link href="css/loaders.css" rel="stylesheet" type="text/css" />
+ <style>
+ .b1{
+	 margin-left:55px;
+	  }
+ </style>
+</head>
+<body>
+	<div class='login'>
+	  <div class='login_title'>
+	    <span>欢迎来到淡雅乐器网</span>
+	  </div>
+	  <div class='login_fields'>
+	    <div class='login_fields__user'>
+	      <div class='icon'>
+	        <img alt="" src='img/user_icon_copy.png'>
+	      </div>
+	      <input name="name" id="name" placeholder='用户名' maxlength="16" type='text' autocomplete="off" />
+	        <div class='validation'>
+	          <img alt="" src='img/tick.png'>
+	        </div>
+	    </div>
+	    <div class='login_fields__user'>
+	      <div class='icon'>
+	        <img alt="" src='img/logo.png' width="17" height="15">
+	      </div>
+	      <input name="email" placeholder='邮箱' maxlength="50" type='text' autocomplete="off">
+	      <div class='validation'>
+	        <img alt="" src='img/tick.png'>
+	      </div>
+	    </div>
+	    <div class='login_fields__password'>
+	      <div class='icon'>
+	        <img alt="" src='img/key.png'>
+	      </div>
+	      <input name="code" placeholder='验证码' maxlength="4" type='text' name="ValidateNum" autocomplete="off">
+	      <div class='validation' style="opacity: 1; right: -5px;top: -3px;">
+          <canvas class="J_codeimg" id="myCanvas" onclick="Code();">对不起，您的浏览器不支持canvas，请下载最新版浏览器!</canvas>
+	      </div>
+	    </div>
+	    <div class='login_fields__submit' > 
+	      <input type='button' value='确认' class="b1">
+	    </div>
+	  </div>
+	  <div class='success'>
+	  
+	  </div>
+	</div>
+	<div class='authent'>
+	  <div class="loader" style="height: 44px;width: 44px;margin-left: 28px;">
+        <div class="loader-inner ball-clip-rotate-multiple">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        </div>
+	  <p>审核中...</p>
+	</div>
+	<div class="OverWindows"></div>
+    <link href="layui/css/layui.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="js/stopExecutionOnTimeout.js?t=1"></script>
+    <script type="text/javascript" src="layui/layui.js"></script>
+    <script type="text/javascript" src="js/Particleground.js"></script>
+    <script type="text/javascript" src="js/Treatment.js"></script>
+    <script type="text/javascript" src="js/jquery.mockjax.js"></script>
+         <script type="text/javascript" src="js/login_register.js"></script>
+	<script type="text/javascript">
+	    var str='input[name="name"],input[name="email"]';
+	    $(str).keyup(
+	    function () {
+	        if (!$(this).val() == '') {
+	            $(this).next().animate({
+	                'opacity': '1',
+	                'right': '30'
+	            }, 200);
+	        } else {
+	            $(this).next().animate({
+	                'opacity': '0',
+	                'right': '20'
+	            }, 200);
+	        }
+	    });
+	    
+	var open = 0; 
+ 
+layui.use('layer', function () {
+	        //非空验证
+	        $('input[type="button"]').click(function () {
+	            var name = $('input[name="name"]').val();
+	            var code = $('input[name="code"]').val();
+	            var email = $('input[name="email"]').val();
+	          var re = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
+	            if (name == '') {
+	                ErroAlert('请输入您的账号');
+	            }
+	            else if (code == '' ) {
+	                ErroAlert('输入验证码');
+	            } else if(code.length != 4||code.toUpperCase() != CodeVal.toUpperCase()){
+	               ErroAlert('验证码输入有误');
+	            }
+	            else if (email == ''){
+	                ErroAlert('请输入邮箱');
+	            } 
+	            else if(!re.test(email)){
+	            
+                  ErroAlert('邮箱输入有误');
+              }
+	         else  {  
+	         
+	                //认证中..
+	                fullscreen();
+	                $('.login').addClass('test'); //倾斜特效
+	                setTimeout(function () {
+	                    $('.login').addClass('testtwo'); //平移特效
+	                }, 300);
+	                setTimeout(function () {
+	                    $('.authent').show().animate({ right: -320 }, {
+	                        easing: 'easeOutQuint',
+	                        duration: 600,
+	                        queue: false
+	                    });
+	                    $('.authent').animate({ opacity: 1 }, {
+	                        duration: 200,
+	                        queue: false
+	                    }).addClass('visible');
+	                }, 500);
+	               
+//审核（修改密码）
+var JsonData = { name: name,email:email};
+ $.post("pro?method=checkUserByNameandEmail",JsonData,function(data){
+if(data.success){
+t(data.msg);
+url = "Ajax/Login";
+}
+else
+url = "Ajax/LoginFalse";
+checkUser(url);
+},"json"); 
+
+
+
+function checkUser(url){
+ AjaxPost(url, JsonData,
+	 function () {
+	                                    //ajax加载中
+	 },
+	  function (data) {
+	                                    //ajax返回 
+	                                    //认证完成
+	                          setTimeout(function () {
+	                                        $('.authent').show().animate({ right: 90 }, {
+	                                            easing: 'easeOutQuint',
+	                                            duration: 600,
+	                                            queue: false
+	                                        });
+	                                        $('.authent').animate({ opacity: 0 }, {
+	                                            duration: 200,
+	                                            queue: false
+	                                        }).addClass('visible');
+	                                        $('.login').removeClass('testtwo'); //平移特效
+	                                    }, 2000);
+
+	                                    setTimeout(function () {
+	                                        $('.authent').hide();
+	                                        $('.login').removeClass('test');
+	                                        if (data.Status == 'ok') {
+	                                            //注册成功
+	                                           $('.login div').fadeOut(100);
+	                                            $('.success').fadeIn(1000);
+	                                            $('.success').html(data.Text);
+												
+	                                        } else {
+	                                            AjaxErro(data);
+	                                        }
+	                                    }, 2400);
+	                                })
+	            }}
+	        })
+	    })
+	    
+	    
+	    var fullscreen = function () {
+	        elem = document.body;
+	        if (elem.webkitRequestFullScreen) {
+	            elem.webkitRequestFullScreen();
+	        } else if (elem.mozRequestFullScreen) {
+	            elem.mozRequestFullScreen();
+	        } else if (elem.requestFullScreen) {
+	            elem.requestFullscreen();
+	        } else {
+	            //浏览器不支持全屏API或已被禁用  
+	        }
+	    }  
+	    
+if(ajaxmockjax == 1){
+function t(msg){
+$.mockjax({  
+				url: 'Ajax/Login',  
+				status: 200,  
+				responseTime: 25,          
+				responseText: {"Status":"ok","Text":"<span style='font-size:20px'>你的密码是:</span><span style='font-size:25px'>"+msg+"</span> <p style='margin-left:150px;margin-top:100px'><a style='color:white;font-size:20px' s href='login.html'>去登录</a></p>"}  
+}); 
+}
+
+$.mockjax({  
+				url: 'Ajax/LoginFalse',  
+				status: 200,  
+				responseTime: 25,          
+				responseText: {"Status":"Erro","Erro":"该用户不存在，请重新确认"}
+			});   
+		}
+
+    </script>
+
+</body>
+</html>
